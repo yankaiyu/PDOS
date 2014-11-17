@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9F77A8DA1A199E610000107F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F77A8D91A199E610000107F /* main.cpp */; };
+		9F9CD6D41A19A306002527E5 /* data_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9F9CD6D21A19A306002527E5 /* data_utils.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,8 @@
 /* Begin PBXFileReference section */
 		9F77A8D61A199E610000107F /* Parallel Degree of Separation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Parallel Degree of Separation"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F77A8D91A199E610000107F /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		9F9CD6D21A19A306002527E5 /* data_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = data_utils.cpp; sourceTree = "<group>"; };
+		9F9CD6D31A19A306002527E5 /* data_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = data_utils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +60,8 @@
 		9F77A8D81A199E610000107F /* Parallel Degree of Separation */ = {
 			isa = PBXGroup;
 			children = (
+				9F9CD6D21A19A306002527E5 /* data_utils.cpp */,
+				9F9CD6D31A19A306002527E5 /* data_utils.h */,
 				9F77A8D91A199E610000107F /* main.cpp */,
 			);
 			path = "Parallel Degree of Separation";
@@ -119,6 +124,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F77A8DA1A199E610000107F /* main.cpp in Sources */,
+				9F9CD6D41A19A306002527E5 /* data_utils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,6 +238,7 @@
 				9F77A8DF1A199E610000107F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
