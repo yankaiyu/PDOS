@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include "data_utils.h"
+#include "dos_utils.h"
 using namespace std;
 
 int main(int argc, const char * argv[]) {
@@ -28,7 +29,7 @@ int main(int argc, const char * argv[]) {
         while (data_file.eof() == false) {
             data_file>>id1>>id2;
             cout<<id1<<" "<<id2<<endl;
-            data_utils_ptr->insertEdge(id1, id2);
+            data_utils_ptr->addEdge(id1, id2);
         }
     } else {
         cout<<"File did not open"<<endl;

@@ -19,25 +19,25 @@ DataUtils* DataUtils::getInstance() {
     return instance;
 }
 
-void DataUtils::insertEdge(int id1, int id2) {
+void DataUtils::addEdge(int user_id1, int user_id2) {
     map<int, vector<int> >::iterator it;
     
-    // Insert edge into id1's firend list
-    it = raw_data_map.find(id1);
+    // Insert edge into user_id1's firend list
+    it = raw_data_map.find(user_id1);
     if (it == raw_data_map.end()) {
-        vector<int> a(1, id2);
-        raw_data_map.insert(pair<int, vector<int> >(id1, a));
+        vector<int> friend_list(1, user_id2);
+        raw_data_map.insert(pair<int, vector<int> >(user_id1, friend_list));
     } else {
-        it->second.push_back(id2);
+        it->second.push_back(user_id2);
     }
 
     // Insert edge into id2's firend list
-    it = raw_data_map.find(id2);
+    it = raw_data_map.find(user_id2);
     if (it == raw_data_map.end()) {
-        vector<int> a(1, id1);
-        raw_data_map.insert(pair<int, vector<int> >(id2, a));
+        vector<int> friend_list(1, user_id1);
+        raw_data_map.insert(pair<int, vector<int> >(user_id2, friend_list));
     } else {
-        it->second.push_back(id1);
+        it->second.push_back(user_id1);
     }
     
     num_of_edges++;

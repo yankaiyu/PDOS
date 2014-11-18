@@ -24,7 +24,7 @@ private:
     
 public:
     static DataUtils* getInstance();
-    void insertEdge(int, int);
+    void addEdge(int user_id1, int user_id2);
     int getNumOfNodes();
     int getNumOfEdges();
 };
