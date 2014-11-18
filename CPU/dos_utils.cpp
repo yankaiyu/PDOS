@@ -1,5 +1,5 @@
 //
-//  data_utils.cpp
+//  dos_utils.cpp
 //  Parallel Degree of Separation
 //
 //  Created by Cary on 11/16/14.
