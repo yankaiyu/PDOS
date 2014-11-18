@@ -27,6 +27,7 @@ public:
     void addEdge(int user_id1, int user_id2);
     int getNumOfNodes();
     int getNumOfEdges();
+    vector<int> getAllNodes();
 };
 
 #endif /* defined(__Parallel_Degree_of_Separation__data_utils__) */

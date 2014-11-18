@@ -44,11 +44,22 @@ void DataUtils::addEdge(int user_id1, int user_id2) {
 }
 
 int DataUtils::getNumOfNodes() {
-    return this->raw_data_map.size();
+    return raw_data_map.size();
 }
 
 int DataUtils::getNumOfEdges() {
     return num_of_edges;
+}
+
+vector<int> DataUtils::getAllNodes() {
+    vector<int> result;
+
+    map<int, vector<int> >::iterator it;
+    for (it = raw_data_map.begin(); it != raw_data_map.end(); it++) {
+        result.push_back(it->first);
+    }
+
+    return result;
 }
 
 DataUtils *DataUtils::instance = NULL;

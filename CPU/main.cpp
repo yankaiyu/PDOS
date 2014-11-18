@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <fstream>
+#include "cpu_parallel.h"
 #include "data_utils.h"
 #include "dos_utils.h"
 using namespace std;
@@ -18,29 +19,17 @@ int main(int argc, const char * argv[]) {
         return 0;
     }
     
-    DataUtils* data_utils_ptr = DataUtils::getInstance();
-    cout<<"Current num of nodes = "<<data_utils_ptr->getNumOfNodes()<<endl;
-    
-    ifstream data_file;
-    data_file.open(argv[1]);
-    if (data_file.is_open()) {
-        cout<<"File opened"<<endl;
-        int id1, id2;
-        while (data_file.eof() == false) {
-            data_file>>id1>>id2;
-            cout<<id1<<" "<<id2<<endl;
-            data_utils_ptr->addEdge(id1, id2);
-        }
-    } else {
-        cout<<"File did not open"<<endl;
-    }
+    CPUParallel pdos_cpu(argv[1]);
 
-    data_file.close();
-    
-    cout<<"Current num of nodes = "<<data_utils_ptr->getNumOfNodes()<<endl;
-    cout<<"Current num of edges = "<<data_utils_ptr->getNumOfEdges()<<endl;
-    
-    
+    int user_id1, user_id2;
+    cout<<"Enter first user's ID: ";
+    cin >> user_id1;
+    cout<<"Enter second user's ID: ";
+    cin >> user_id2;
+
+    int dos = pdos_cpu.getDOS(user_id1, user_id2);
+
+    cout<<"Degree of Separation between User "<<user_id1<<" and User "<<user_id2<<" is "<<dos<<endl;
     
     return 0;
 }

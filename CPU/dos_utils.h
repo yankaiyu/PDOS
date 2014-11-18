@@ -23,7 +23,7 @@ public:
 	OneLevelInfo(int current_level);
 	int getCurrentLevel();
 	void addUser(int user_id);
-	vector<int>& getCurrentLevelUserList();
+	vector<int> getCurrentLevelUserList();
 	int getCurrentLevelUserNum();
 };
 
@@ -36,8 +36,26 @@ class ResultsPerUser {
 public:
 	ResultsPerUser(int user_id);
 	int getUserId();
+	vector<OneLevelInfo> getAllLevelInfoList();
 	void addUserAtLevel(int user_id, int level);
 	void addOneLevel(OneLevelInfo one_level_info);
+};
+
+/*
+ * Store all users that can be reached from all users
+ */
+class ResultsAllUsers {
+private:
+    ResultsAllUsers();
+    static ResultsAllUsers* instance;
+
+	vector<ResultsPerUser> user_result_list;
+public:
+	static ResultsAllUsers* getInstance();
+	vector<ResultsPerUser> getAllResults();
+	ResultsPerUser* getOneUserResults(int user_id);
+	void addUserById(int user_id);
+	void addUserByResults(ResultsPerUser results_per_user);
 };
 
 #endif /* defined(__Parallel_Degree_of_Separation__dos_utils__) */
