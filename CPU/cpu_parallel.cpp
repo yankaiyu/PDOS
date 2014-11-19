@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <omp.h>
 #include "cpu_parallel.h"
 using namespace std;
 
@@ -18,7 +19,7 @@ using namespace std;
 CPUParallel::CPUParallel(const char* filename) {
     /* Read data file in */
     DataUtils* data_utils_ptr = DataUtils::getInstance();
-    cout<<"Current num of nodes = "<<data_utils_ptr->getNumOfNodes()<<endl;
+    //cout<<"Current num of nodes = "<<data_utils_ptr->getNumOfNodes()<<endl;
     
     ifstream data_file;
     data_file.open(filename);
@@ -27,7 +28,7 @@ CPUParallel::CPUParallel(const char* filename) {
         int id1, id2;
         while (data_file.eof() == false) {
             data_file>>id1>>id2;
-            cout<<id1<<" "<<id2<<endl;
+            //cout<<id1<<" "<<id2<<endl;
             data_utils_ptr->addEdge(id1, id2);
         }
     } else {
@@ -36,8 +37,8 @@ CPUParallel::CPUParallel(const char* filename) {
     }
     data_file.close();
     
-    cout<<"Current num of nodes = "<<data_utils_ptr->getNumOfNodes()<<endl;
-    cout<<"Current num of edges = "<<data_utils_ptr->getNumOfEdges()<<endl;
+    cout<<"#Node := "<<data_utils_ptr->getNumOfNodes()<<endl;
+    cout<<"#Edge := "<<data_utils_ptr->getNumOfEdges()<<endl;
 
     /* Initialization */
     cout<<">>>Initializing. It may take a while..."<<endl;
@@ -47,10 +48,10 @@ CPUParallel::CPUParallel(const char* filename) {
 
     set<int> all_user_set;
     int user_count = all_user_list.size();
+    
     for (int i = 0; i < user_count; i++) {
         all_user_set.insert(all_user_list[i]);
     }
-
     
     for (int i = 0; i < all_user_list.size(); i++) {
         this->all_result_ptr->addUserById(all_user_list[i]);
@@ -108,7 +109,9 @@ void CPUParallel::deepenOneLevel() {
     cout<<">>>Deepen by one level. It may take a while..."<<endl;
 
     int user_count = all_user_list.size();
+
     /* Search one by one for each user. Should go parallel here */
+    #pragma omp parallel for
     for (int i = 0; i < user_count; i++) {
         all_result_ptr->getResultsByUser(all_user_list[i])->deepenOneLevel();
     }

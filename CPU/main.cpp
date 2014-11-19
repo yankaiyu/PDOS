@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
+#include <omp.h>
 #include "cpu_parallel.h"
 #include "data_utils.h"
 #include "dos_utils.h"
@@ -18,12 +20,23 @@ int main(int argc, const char * argv[]) {
         cout<<"Please enter the path of input data file"<<endl;
         return 0;
     }
+
+    int num_of_threads = 1;
+    if (argc >= 3) {
+        num_of_threads = atoi(argv[2]);  
+    }
+    omp_set_num_threads(num_of_threads);
     
+    double t_begin = omp_get_wtime();
     CPUParallel pdos_cpu(argv[1]);
+    double t_end = omp_get_wtime();
+    printf(">>>Initializaton takes := %fs with #Core := %d\n\n", t_end - t_begin, num_of_threads);
 
     int search_depth;
     cout<<"#Level you want to search: ";
     cin>>search_depth;
+
+    t_begin = omp_get_wtime();
 
     for (int i = 1; i <= search_depth; i++) {
         cout<<">>>Current level := "<<i<<endl;
@@ -31,6 +44,9 @@ int main(int argc, const char * argv[]) {
     }
 
     cout<<endl<<">>>Search finished!\n";
+
+    t_end = omp_get_wtime();
+    printf(">>>Time used := %fs with #Core := %d\n\n", t_end - t_begin, num_of_threads);
 
     bool should_continue = true;
     while (should_continue) {

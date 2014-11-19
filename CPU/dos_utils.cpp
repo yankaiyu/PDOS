@@ -7,6 +7,7 @@
 //
 
 #include "dos_utils.h"
+#include <omp.h>
 //#include <iostream>
 using namespace std;
 
@@ -154,12 +155,14 @@ void ResultsPerUser::deepenOneLevel() {
 }
 
 void ResultsAllUsers::initiAllUserSet(set<int> all_user_set) {
+    #pragma omp parallel for
     for (int i = 0; i < user_result_list.size(); i++) {
         user_result_list[i].initAllUserSet(all_user_set);
     }
 }
 
 void ResultsAllUsers::initFriendList(map<int, vector<int> > raw_data_map) {
+    #pragma omp parallel for
     for (int i = 0; i < user_result_list.size(); i++) {
         user_result_list[i].initFriendList(raw_data_map);
     }
