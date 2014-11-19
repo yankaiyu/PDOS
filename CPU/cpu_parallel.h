@@ -16,7 +16,7 @@
 using namespace std;
 
 /*
- * Store users that can be reached from one user with minimum distance == current_level
+ * Interface for parallel verison of CPU based Degree of Separation
  */
 class CPUParallel {
 private:
