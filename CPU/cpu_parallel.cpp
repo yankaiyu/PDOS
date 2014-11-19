@@ -40,41 +40,76 @@ CPUParallel::CPUParallel(const char* filename) {
     cout<<"Current num of edges = "<<data_utils_ptr->getNumOfEdges()<<endl;
 
     /* Initialization */
+    cout<<">>>Initializing. It may take a while..."<<endl;
     this->raw_data_ptr = data_utils_ptr;
     this->all_result_ptr = ResultsAllUsers::getInstance();
     this->all_user_list = data_utils_ptr->getAllNodes();
 
-    cout<<">>>before insert user_ids at level 0"<<endl;
+    set<int> all_user_set;
+    int user_count = all_user_list.size();
+    for (int i = 0; i < user_count; i++) {
+        all_user_set.insert(all_user_list[i]);
+    }
+
+    
     for (int i = 0; i < all_user_list.size(); i++) {
         this->all_result_ptr->addUserById(all_user_list[i]);
     }
-    cout<<">>>after insert user_ids at level 0"<<endl;
+
+    all_result_ptr->initiAllUserSet(all_user_set);
+    all_result_ptr->initFriendList(this->raw_data_ptr->getRawDataMap());
+
+    cout<<">>>Initialization finished!"<<endl;
 }
 
 /* Return the degree of separation betwen user 1 and user 2. Return -1 if not connected */
-int CPUParallel::getDOS(int user_id1, int user_id2) {
-    ResultsPerUser* user_results_ptr = this->all_result_ptr->getOneUserResults(user_id1);
+vector<int> CPUParallel::getDOS(int user_id1, int user_id2) {
+    ResultsPerUser* user_results_ptr = this->all_result_ptr->getResultsByUser(user_id1);
+    vector<int> result_path;
     if (user_results_ptr == NULL) {
-        return -1;
+        return result_path;
     }
 
-    vector<OneLevelInfo> all_level_info_list = user_results_ptr->getAllLevelInfoList();
-    int total_level_count = all_level_info_list.size();
+    vector<OneLevelInfo>* all_level_info_list = user_results_ptr->getAllLevelInfoList();
+    int total_level_count = all_level_info_list->size();
 
     for (int i = 0; i < total_level_count; i++) {
-        vector<int> one_level_user_list = all_level_info_list[i].getCurrentLevelUserList();
-        int user_this_level_count = one_level_user_list.size();
+        vector<UserTrace>* one_level_user_list = (*all_level_info_list)[i].getCurrentLevelUserList();
+        int user_this_level_count = one_level_user_list->size();
         for (int j = 0; j < user_this_level_count; j++) {
-            if (one_level_user_list[j] == user_id2) {
-                return i;
+            if ((*one_level_user_list)[j].user_id == user_id2) {
+                // Found solution. Reconstructe path
+                int current_level = i - 1;
+                int previous_id = (*one_level_user_list)[j].previous_id;
+                int current_id = user_id2;
+                while (current_level >= 0) {
+                    result_path.push_back(current_id);
+                    vector<UserTrace>* previous_level_user_list = (*all_level_info_list)[current_level].getCurrentLevelUserList();
+                    for (int k = 0; k < previous_level_user_list->size(); k++) {
+                        if ((*previous_level_user_list)[k].user_id == previous_id) {
+                            current_id = previous_id;
+                            previous_id = (*previous_level_user_list)[k].previous_id;
+                            break;
+                        }
+                    }
+                    current_level--;
+                }
+                result_path.push_back(current_id);
+                return result_path;
             }
         }
     }
 
-    return -1;
+    return result_path;
 }
 
-/* Search for all users and extend their dos info by one level */
+/* Search for all users and deepen their dos info by one level */
 void CPUParallel::deepenOneLevel() {
-    //
+    cout<<">>>Deepen by one level. It may take a while..."<<endl;
+
+    int user_count = all_user_list.size();
+    /* Search one by one for each user. Should go parallel here */
+    for (int i = 0; i < user_count; i++) {
+        all_result_ptr->getResultsByUser(all_user_list[i])->deepenOneLevel();
+    }
 }

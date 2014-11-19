@@ -62,4 +62,8 @@ vector<int> DataUtils::getAllNodes() {
     return result;
 }
 
+map<int, vector<int> > DataUtils::getRawDataMap() {
+    return raw_data_map;
+}
+
 DataUtils *DataUtils::instance = NULL;

@@ -11,19 +11,32 @@
 
 #include <stdio.h>
 #include <vector>
+#include <set>
+#include <map>
 using namespace std;
+
+/*
+ * Struct to store the path to current user
+ */
+class UserTrace {
+public:
+	int user_id;
+	int previous_id;
+	UserTrace(int user_id, int previous_id = -1);
+	bool operator<(UserTrace) const;
+};
 
 /*
  * Store users that can be reached from one user with minimum distance == current_level
  */
 class OneLevelInfo {
 	int current_level;
-	vector<int> current_level_user_list;
+	vector<UserTrace> current_level_user_list;
 public:
 	OneLevelInfo(int current_level);
 	int getCurrentLevel();
-	void addUser(int user_id);
-	vector<int> getCurrentLevelUserList();
+	void addUser(UserTrace user);
+	vector<UserTrace>* getCurrentLevelUserList();
 	int getCurrentLevelUserNum();
 };
 
@@ -33,12 +46,17 @@ public:
 class ResultsPerUser {
 	int user_id;
 	vector<OneLevelInfo> all_level_info_list;
+	set<int> remained_user_set;
+	map<int, vector<int> > raw_data_map;
 public:
 	ResultsPerUser(int user_id);
+	void initAllUserSet(set<int> all_user_set);
+	void initFriendList(map<int, vector<int> > raw_data_map);
 	int getUserId();
-	vector<OneLevelInfo> getAllLevelInfoList();
+	vector<OneLevelInfo>* getAllLevelInfoList();
 	void addUserAtLevel(int user_id, int level);
 	void addOneLevel(OneLevelInfo one_level_info);
+	void deepenOneLevel();
 };
 
 /*
@@ -52,8 +70,10 @@ private:
 	vector<ResultsPerUser> user_result_list;
 public:
 	static ResultsAllUsers* getInstance();
-	vector<ResultsPerUser> getAllResults();
-	ResultsPerUser* getOneUserResults(int user_id);
+	void initiAllUserSet(set<int> remained_user_set);
+	void initFriendList(map<int, vector<int> > raw_data_map);
+	vector<ResultsPerUser>* getAllResults();
+	ResultsPerUser* getResultsByUser(int user_id);
 	void addUserById(int user_id);
 	void addUserByResults(ResultsPerUser results_per_user);
 };

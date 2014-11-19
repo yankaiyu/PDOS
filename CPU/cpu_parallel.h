@@ -25,7 +25,7 @@ private:
 	vector<int> all_user_list;
 public:
 	CPUParallel(const char* filename);
-	int getDOS(int user_id1, int user_id2);
+	vector<int> getDOS(int user_id1, int user_id2);
 	void deepenOneLevel();
 };
 

@@ -28,6 +28,7 @@ public:
     int getNumOfNodes();
     int getNumOfEdges();
     vector<int> getAllNodes();
+    map<int, vector<int> > getRawDataMap();
 };
 
 #endif /* defined(__Parallel_Degree_of_Separation__data_utils__) */
