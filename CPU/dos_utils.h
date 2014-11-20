@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <vector>
 #include <set>
-#include <map>
+#include <unordered_map>
 using namespace std;
 
 /*
@@ -48,11 +48,11 @@ class ResultsPerUser {
 	int user_id;
 	vector<OneLevelInfo> all_level_info_list;
 	set<int> remained_user_set;
-	map<int, vector<int> > raw_data_map;
+	unordered_map<int, vector<int> > raw_data_map;
 public:
 	ResultsPerUser(int user_id);
 	void initAllUserSet(set<int> all_user_set);
-	void initFriendList(map<int, vector<int> > raw_data_map);
+	void initFriendList(unordered_map<int, vector<int> > raw_data_map);
 	int getUserId();
 	vector<OneLevelInfo>* getAllLevelInfoList();
 	void addUserAtLevel(int user_id, int level);
@@ -72,7 +72,7 @@ private:
 public:
 	static ResultsAllUsers* getInstance();
 	void initiAllUserSet(set<int> remained_user_set);
-	void initFriendList(map<int, vector<int> > raw_data_map);
+	void initFriendList(unordered_map<int, vector<int> > raw_data_map);
 	vector<ResultsPerUser>* getAllResults();
 	ResultsPerUser* getResultsByUser(int user_id);
 	void addUserById(int user_id);

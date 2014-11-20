@@ -64,7 +64,7 @@ void ResultsPerUser::initAllUserSet(set<int> all_user_set) {
 }
 
 /* Init the friend lists for this user */
-void ResultsPerUser::initFriendList(map<int, vector<int> > raw_data_map) {
+void ResultsPerUser::initFriendList(unordered_map<int, vector<int> > raw_data_map) {
     this->raw_data_map = raw_data_map;
 }
 
@@ -128,7 +128,7 @@ void ResultsPerUser::deepenOneLevel() {
     int previous_level_user_count = all_level_info_list[current_level - 1].getCurrentLevelUserNum();
 
     OneLevelInfo new_level(current_level);
-    map<int, vector<int> >::iterator it;
+    unordered_map<int, vector<int> >::iterator it;
 
     /* Search through new users found in previous deepest level to deepen path by one */
     for (int i = 0; i < previous_level_user_count; i++) {
@@ -177,7 +177,7 @@ void ResultsAllUsers::initiAllUserSet(set<int> all_user_set) {
 }
 
 /* Init the friend lists for all users stored in the ResultsAllUser object */
-void ResultsAllUsers::initFriendList(map<int, vector<int> > raw_data_map) {
+void ResultsAllUsers::initFriendList(unordered_map<int, vector<int> > raw_data_map) {
     #pragma omp parallel for
     for (int i = 0; i < user_result_list.size(); i++) {
         user_result_list[i].initFriendList(raw_data_map);
