@@ -21,7 +21,6 @@ private:
     
     int num_of_edges;
     unordered_map<int, vector<int> > raw_data_map;
-    vector<int> user_list;
 
 public:
     static DataUtils* getInstance();
