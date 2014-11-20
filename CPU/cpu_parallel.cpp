@@ -79,7 +79,7 @@ vector<int> CPUParallel::getDOS(int user_id1, int user_id2) {
         int user_this_level_count = one_level_user_list->size();
         for (int j = 0; j < user_this_level_count; j++) {
             if ((*one_level_user_list)[j].user_id == user_id2) {
-                // Found solution. Reconstructe path
+                // Found solution. Reconstructe path backwards from user_id2 to user_id1
                 int current_level = i - 1;
                 int previous_id = (*one_level_user_list)[j].previous_id;
                 int current_id = user_id2;
@@ -95,7 +95,7 @@ vector<int> CPUParallel::getDOS(int user_id1, int user_id2) {
                     }
                     current_level--;
                 }
-                result_path.push_back(current_id);
+                result_path.push_back(current_id); // push back the last node excluded by the while loop
                 return result_path;
             }
         }

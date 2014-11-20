@@ -12,6 +12,7 @@ DataUtils::DataUtils() {
     this->num_of_edges = 0;
 }
 
+/* Get the singleton instance of class DataUtils */
 DataUtils* DataUtils::getInstance() {
     if (!instance) {
         instance = new DataUtils();
@@ -43,14 +44,17 @@ void DataUtils::addEdge(int user_id1, int user_id2) {
     num_of_edges++;
 }
 
+/* Get total number of users in the data file */
 int DataUtils::getNumOfNodes() {
     return raw_data_map.size();
 }
 
+/* Get total number of edges in the data file */
 int DataUtils::getNumOfEdges() {
     return num_of_edges;
 }
 
+/* Get the list of all users' IDs in a vector of integer */
 vector<int> DataUtils::getAllNodes() {
     vector<int> result;
 
@@ -62,6 +66,7 @@ vector<int> DataUtils::getAllNodes() {
     return result;
 }
 
+/* Get the raw data map containing users and their own friend lists */
 map<int, vector<int> > DataUtils::getRawDataMap() {
     return raw_data_map;
 }

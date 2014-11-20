@@ -19,9 +19,11 @@ UserTrace::UserTrace(int user_id, int previous_id) {
     this->previous_id = previous_id;
 }
 
+/*
 bool UserTrace::operator<(UserTrace other) const {
     return (this->user_id < other.user_id);
 }
+*/
 
 /*
  * Class OneLevelInfo
@@ -38,10 +40,12 @@ void OneLevelInfo::addUser(UserTrace user) {
     current_level_user_list.push_back(user);
 }
 
+/* Get the list of users that can be reached at this path level */
 vector<UserTrace>* OneLevelInfo::getCurrentLevelUserList() {
     return &current_level_user_list;
 }
 
+/* Get the number of users that can be reached at this path level */
 int OneLevelInfo::getCurrentLevelUserNum() {
     return current_level_user_list.size();
 }
@@ -54,22 +58,27 @@ ResultsPerUser::ResultsPerUser(int user_id) {
     addUserAtLevel(user_id, 0);
 }
 
+/* Init the set containing all users' ids for this user */
 void ResultsPerUser::initAllUserSet(set<int> all_user_set) {
     this->remained_user_set = all_user_set;
 }
 
+/* Init the friend lists for this user */
 void ResultsPerUser::initFriendList(map<int, vector<int> > raw_data_map) {
     this->raw_data_map = raw_data_map;
 }
 
+/* Get this user's id */
 int ResultsPerUser::getUserId() {
     return user_id;
 }
 
+/* Get users that can be reached by this user at all levels already searched */
 vector<OneLevelInfo>* ResultsPerUser::getAllLevelInfoList() {
     return &all_level_info_list;
 }
 
+/* Add a new user that can be reached by this user to a level being explored now */
 void ResultsPerUser::addUserAtLevel(int user_id, int level) {
     int list_size = all_level_info_list.size();
     if (list_size < level + 1) {
@@ -85,6 +94,7 @@ void ResultsPerUser::addUserAtLevel(int user_id, int level) {
     return;
 }
 
+/* Add a OneLevel object containing all new users that can be reached by this user at one level */
 void ResultsPerUser::addOneLevel(OneLevelInfo one_level_info) {
     int list_size = all_level_info_list.size();
     int level = one_level_info.getCurrentLevel();
@@ -120,6 +130,7 @@ void ResultsPerUser::deepenOneLevel() {
     OneLevelInfo new_level(current_level);
     map<int, vector<int> >::iterator it;
 
+    /* Search through new users found in previous deepest level to deepen path by one */
     for (int i = 0; i < previous_level_user_count; i++) {
         int user_id = (*previous_level_users)[i].user_id;
         vector<int> friend_list_of_user = raw_data_map.find(user_id)->second;
@@ -127,6 +138,8 @@ void ResultsPerUser::deepenOneLevel() {
 
         for (int j = 0; j < friends_count; j++) {
             if (remained_user_set.find(friend_list_of_user[j]) != remained_user_set.end()) {
+                // Find a path to a new user who has not been reached by this user before.
+                // Record it using UserTrace object and remove new user's id from remained unvisited users' set
                 new_level.addUser(UserTrace(friend_list_of_user[j], user_id));
                 remained_user_set.erase(friend_list_of_user[j]);
             }
@@ -137,6 +150,7 @@ void ResultsPerUser::deepenOneLevel() {
         // No more user can be obtained from this level on. Stop search.
         return;
     } else {
+        // Add the OneLevel object containing all new users find at this level into this user's results
         addOneLevel(new_level);
     }
     return;
@@ -154,6 +168,7 @@ void ResultsPerUser::deepenOneLevel() {
     return instance;
 }
 
+/* Init the set containing all users' ids for each users stored in the ResultsAllUser object */
 void ResultsAllUsers::initiAllUserSet(set<int> all_user_set) {
     #pragma omp parallel for
     for (int i = 0; i < user_result_list.size(); i++) {
@@ -161,6 +176,7 @@ void ResultsAllUsers::initiAllUserSet(set<int> all_user_set) {
     }
 }
 
+/* Init the friend lists for all users stored in the ResultsAllUser object */
 void ResultsAllUsers::initFriendList(map<int, vector<int> > raw_data_map) {
     #pragma omp parallel for
     for (int i = 0; i < user_result_list.size(); i++) {
@@ -168,10 +184,12 @@ void ResultsAllUsers::initFriendList(map<int, vector<int> > raw_data_map) {
     }
 }
 
+/* Get the ResultsPerUser objects for all users in a vector */
 vector<ResultsPerUser>* ResultsAllUsers::getAllResults() {
     return &user_result_list;
 }
 
+/* Get the ResultsPerUser object of specified user */
 ResultsPerUser* ResultsAllUsers::getResultsByUser(int user_id) {
     vector<ResultsPerUser>::iterator it;
 

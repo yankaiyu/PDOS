@@ -16,14 +16,15 @@
 using namespace std;
 
 /*
- * Struct to store the path to current user
+ * Struct to record current step's user id and the parent user linking to this one
+ * Used to reconstruct the path between two users
  */
 class UserTrace {
 public:
 	int user_id;
 	int previous_id;
 	UserTrace(int user_id, int previous_id = -1);
-	bool operator<(UserTrace) const;
+	//bool operator<(UserTrace) const;
 };
 
 /*
