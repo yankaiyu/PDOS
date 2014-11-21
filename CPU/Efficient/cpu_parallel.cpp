@@ -46,7 +46,6 @@ CPUParallel::CPUParallel(const char* filename) {
     this->all_result_ptr = ResultsAllUsers::getInstance();
     this->all_user_list = data_utils_ptr->getAllNodes();
 
-    set<int> all_user_set;
     int user_count = all_user_list.size();
     
     for (int i = 0; i < user_count; i++) {
@@ -57,16 +56,43 @@ CPUParallel::CPUParallel(const char* filename) {
         this->all_result_ptr->addUserById(all_user_list[i]);
     }
 
-    all_result_ptr->initiAllUserSet(all_user_set);
-    all_result_ptr->initFriendList(this->raw_data_ptr->getRawDataMap());
+    //all_result_ptr->initAllUserSet(all_user_set);
+    //all_result_ptr->initFriendList(this->raw_data_ptr->getRawDataMap());
+    all_result_ptr->initUserToGroupMap(all_user_list);
 
     cout<<">>>Initialization finished!"<<endl;
 }
 
-/* Return the degree of separation betwen user 1 and user 2. Return -1 if not connected */
+/* Return the degree of separation betwen user 1 and user 2 */
 vector<int> CPUParallel::getDOS(int user_id1, int user_id2) {
-    ResultsPerUser* user_results_ptr = this->all_result_ptr->getResultsByUser(user_id1);
     vector<int> result_path;
+    unordered_map<int, int>* user_to_group_map = all_result_ptr->getUserToGroupMap();
+
+    int group_idx1 = (*user_to_group_map)[user_id1];
+    int group_idx2 = (*user_to_group_map)[user_id2];
+
+    if (group_idx1 != group_idx2 || group_idx1 == -1) {
+        return result_path;
+    }
+
+    int root_user_id = (*all_result_ptr->getGroupToRootUserMap())[group_idx1];
+
+    vector<int> user_id1_to_root = constructPath(root_user_id, user_id1);
+    vector<int> user_id2_to_root = constructPath(root_user_id, user_id2);
+
+    result_path.reserve(user_id1_to_root.size() + user_id2_to_root.size());
+    result_path.insert(result_path.end(), user_id1_to_root.begin(), user_id1_to_root.end());
+    for (int i = user_id2_to_root.size() - 1; i >=0 ; i--) {
+        result_path.push_back(user_id2_to_root[i]);
+    }
+    return result_path;
+}
+
+/* Return a vector contain the path from child_user_id to root_user_id */
+vector<int> CPUParallel::constructPath(int root_user_id, int child_user_id) {
+    vector<int> result_path;
+    ResultsPerUser* user_results_ptr = this->all_result_ptr->getResultsByUser(root_user_id);
+    
     if (user_results_ptr == NULL) {
         return result_path;
     }
@@ -78,11 +104,11 @@ vector<int> CPUParallel::getDOS(int user_id1, int user_id2) {
         vector<UserTrace>* one_level_user_list = (*all_level_info_list)[i].getCurrentLevelUserList();
         int user_this_level_count = one_level_user_list->size();
         for (int j = 0; j < user_this_level_count; j++) {
-            if ((*one_level_user_list)[j].user_id == user_id2) {
-                // Found solution. Reconstructe path backwards from user_id2 to user_id1
+            if ((*one_level_user_list)[j].user_id == child_user_id) {
+                // Found solution. Reconstructe path backwards from child_user_id to root_user_id
                 int current_level = i - 1;
                 int previous_id = (*one_level_user_list)[j].previous_id;
-                int current_id = user_id2;
+                int current_id = child_user_id;
                 while (current_level >= 0) {
                     result_path.push_back(current_id);
                     vector<UserTrace>* previous_level_user_list = (*all_level_info_list)[current_level].getCurrentLevelUserList();
@@ -105,14 +131,29 @@ vector<int> CPUParallel::getDOS(int user_id1, int user_id2) {
 }
 
 /* Search for all users and deepen their dos info by one level */
-void CPUParallel::deepenOneLevel() {
-    cout<<">>>Deepen by one level. It may take a while..."<<endl;
-
+void CPUParallel::searchAll() {
     int user_count = all_user_list.size();
 
+    vector<ResultsPerUser>* all_results = all_result_ptr->getAllResults();
+    unordered_map<int, int> user_id_to_vector_idx_map;
+    for (int i = 0; i < all_results->size(); i++) {
+        int user_id = (*all_results)[i].getUserId();
+        user_id_to_vector_idx_map[user_id] = i;
+    }
+
     /* Search one by one for each user. Should go parallel here */
-    #pragma omp parallel for
-    for (int i = 0; i < user_count; i++) {
-        all_result_ptr->getResultsByUser(all_user_list[i])->deepenOneLevel();
+    int current_group_idx = 0;
+    vector<int>::iterator it;
+    for (it = all_user_list.begin(); it < all_user_list.end(); it++) {
+        if (all_result_ptr->getUserToGroupMap()->find(*it)->second != -1) {
+            // This user has already been checked, don't need to expand him/her
+            continue;
+        } else {
+            current_group_idx++;
+            all_result_ptr->getGroupToRootUserMap()->insert(pair<int, int>(current_group_idx, *it));
+            int vector_idx = user_id_to_vector_idx_map[*it];
+            (*all_results)[vector_idx].initFriendList(this->raw_data_ptr->getRawDataMap());
+            all_result_ptr->getResultsByUser(*it)->searchAll(current_group_idx, all_result_ptr->getUserToGroupMap());
+        }
     }
 }
