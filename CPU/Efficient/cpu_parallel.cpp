@@ -80,11 +80,26 @@ vector<int> CPUParallel::getDOS(int user_id1, int user_id2) {
     vector<int> user_id1_to_root = constructPath(root_user_id, user_id1);
     vector<int> user_id2_to_root = constructPath(root_user_id, user_id2);
 
-    result_path.reserve(user_id1_to_root.size() + user_id2_to_root.size());
-    result_path.insert(result_path.end(), user_id1_to_root.begin(), user_id1_to_root.end());
-    for (int i = user_id2_to_root.size() - 1; i >=0 ; i--) {
+    // Count shared parent nodes
+    int idx1 = user_id1_to_root.size() - 1;
+    int idx2 = user_id2_to_root.size() - 1;
+    int shared_node_count = 0;
+
+    while (idx1 >= 0 &&  idx2 >= 0 && user_id1_to_root[idx1] == user_id2_to_root[idx2]) {
+        idx1--;
+        idx2--;
+        shared_node_count++;
+    }
+
+    // Merge two list with only one nearest common parent
+    for (int i = 0; i < user_id1_to_root.size() - shared_node_count; i++) {
+        result_path.push_back(user_id1_to_root[i]);
+    }
+
+    for (int i = user_id2_to_root.size() - shared_node_count; i >= 0 ; i--) {
         result_path.push_back(user_id2_to_root[i]);
     }
+
     return result_path;
 }
 
