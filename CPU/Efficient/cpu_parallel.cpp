@@ -156,4 +156,6 @@ void CPUParallel::searchAll() {
             all_result_ptr->getResultsByUser(*it)->searchAll(current_group_idx, all_result_ptr->getUserToGroupMap());
         }
     }
+
+    cout<<">>>Total #Group := "<<current_group_idx<<endl;
 }
