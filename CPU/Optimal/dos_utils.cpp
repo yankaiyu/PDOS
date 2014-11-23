@@ -213,9 +213,7 @@ void ResultsAllUsers::addUserById(int user_id) {
     }
 
     // User Id doesn't exist, add new entry
-    //cout<<">>>Push back user_id: "<<user_id<<endl;
     user_result_list.push_back(ResultsPerUser(user_id));
-    //cout<<">>>Pushed back user_id: "<<user_id<<endl;
 
     return;
 }

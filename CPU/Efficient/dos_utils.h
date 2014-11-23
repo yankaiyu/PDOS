@@ -71,14 +71,15 @@ private:
 	unordered_map<int, int> group_to_root_user_map;
 public:
 	static ResultsAllUsers* getInstance();
-	//void initAllUserSet(set<int> remained_user_set);
 	void initFriendList(unordered_map<int, vector<int> > raw_data_map);
 	void initUserToGroupMap(vector<int> all_user_list);
 	vector<ResultsPerUser>* getAllResults();
 	ResultsPerUser* getResultsByUser(int user_id);
 	unordered_map<int, int>* getUserToGroupMap();
 	unordered_map<int, int>* getGroupToRootUserMap();
+	void resizeUserVector(int user_count);
 	void addUserById(int user_id);
+	void addUserByIdAt(int user_id, int idx);
 	void addUserByResults(ResultsPerUser results_per_user);
 };
 

@@ -40,7 +40,7 @@ int main(int argc, const char * argv[]) {
 
     t_end = omp_get_wtime();
 
-    cout<<endl<<">>>Search finished!\n";
+    cout<<">>>Search finished!\n";
 
     
     printf(">>>Time used := %fs with #Core := %d\n\n", t_end - t_begin, num_of_threads);
@@ -54,16 +54,20 @@ int main(int argc, const char * argv[]) {
         cout<<"Enter second user's ID: ";
         cin >> user_id2;
 
-        vector<int> dos = pdos_cpu.getDOS(user_id1, user_id2);
-
-        if (dos.size() == 0) {
-            cout<<"\nUser "<<user_id1<<" and User "<<user_id2<<" are not connected.\n\n";
+        if ((pdos_cpu.hasUser(user_id1) && pdos_cpu.hasUser(user_id2)) == false) {
+            cout<<"Invalid User ID(s)."<<endl;
         } else {
-            cout<<"\nDegree of Separation between User "<<user_id1<<" and User "<<user_id2<<" is "<<dos.size() - 1<<endl;
-            for (int i = 0; i < dos.size() - 1; i++) {
-                cout<<dos[i]<<"<-";
+            vector<int> dos = pdos_cpu.getDOS(user_id1, user_id2);
+
+            if (dos.size() == 0) {
+                cout<<"\nUser "<<user_id1<<" and User "<<user_id2<<" are not connected.\n\n";
+            } else {
+                cout<<"\nDegree of Separation between User "<<user_id1<<" and User "<<user_id2<<" is "<<dos.size() - 1<<endl;
+                for (int i = 0; i < dos.size() - 1; i++) {
+                    cout<<dos[i]<<"<-";
+                }
+                cout<<dos[dos.size() - 1]<<endl;
             }
-            cout<<dos[dos.size() - 1]<<endl;
         }
         
         cout<<"\nDo you want to continue? 1 for yes and 0 for no: ";

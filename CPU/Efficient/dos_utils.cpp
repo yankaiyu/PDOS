@@ -129,14 +129,14 @@ void ResultsPerUser::searchAll(int group_idx, unordered_map<int, int>* user_to_g
         OneLevelInfo new_level(current_level);
 
         /* Search through new users found in previous deepest level to deepen path by one */
-        unordered_map<int, int>::iterator it;
+        #pragma omp for
         for (int i = 0; i < previous_level_user_count; i++) {
             int user_id = (*previous_level_users)[i].user_id;
             vector<int> friend_list_of_user = raw_data_map.find(user_id)->second;
             int friends_count = friend_list_of_user.size();
 
             for (int j = 0; j < friends_count; j++) {
-                it = user_to_group_map->find(friend_list_of_user[j]);
+                unordered_map<int, int>::iterator it = user_to_group_map->find(friend_list_of_user[j]);
                 if (it != user_to_group_map->end() && it->second == -1) {
                     // Find a path to a new user who has not been reached by this user before.
                     // Record it using UserTrace object and result vector
@@ -226,6 +226,12 @@ unordered_map<int, int>* ResultsAllUsers::getGroupToRootUserMap() {
     return &group_to_root_user_map;
 }
 
+/* Resize the vector with the number of users */
+void ResultsAllUsers::resizeUserVector(int user_count) {
+    user_result_list.resize(user_count, ResultsPerUser(0));
+}
+
+/* Add an user object with specified ID */
 void ResultsAllUsers::addUserById(int user_id) {
     int user_list_size = user_result_list.size();
 
@@ -237,10 +243,15 @@ void ResultsAllUsers::addUserById(int user_id) {
     }
 
     // User Id doesn't exist, add new entry
-    //cout<<">>>Push back user_id: "<<user_id<<endl;
     user_result_list.push_back(ResultsPerUser(user_id));
-    //cout<<">>>Pushed back user_id: "<<user_id<<endl;
 
+    return;
+}
+
+/* Add an user object with specified ID at assigned position */
+void ResultsAllUsers::addUserByIdAt(int user_id, int idx) {
+    int user_list_size = user_result_list.size();
+    user_result_list[idx] = ResultsPerUser(user_id);
     return;
 }
 

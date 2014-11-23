@@ -51,13 +51,14 @@ CPUParallel::CPUParallel(const char* filename) {
     for (int i = 0; i < user_count; i++) {
         all_user_set.insert(all_user_list[i]);
     }
+
+    all_result_ptr->resizeUserVector(user_count);
     
-    for (int i = 0; i < all_user_list.size(); i++) {
-        this->all_result_ptr->addUserById(all_user_list[i]);
+    #pragma omp parallel for
+    for (int i = 0; i < user_count; i++) {
+        this->all_result_ptr->addUserByIdAt(all_user_list[i], i);
     }
 
-    //all_result_ptr->initAllUserSet(all_user_set);
-    //all_result_ptr->initFriendList(this->raw_data_ptr->getRawDataMap());
     all_result_ptr->initUserToGroupMap(all_user_list);
 
     cout<<">>>Initialization finished!"<<endl;
@@ -145,6 +146,11 @@ vector<int> CPUParallel::constructPath(int root_user_id, int child_user_id) {
     return result_path;
 }
 
+/* Return if the input user id exists */
+bool CPUParallel::hasUser(int user_id) {
+    return all_user_set.find(user_id) != all_user_set.end();
+}
+
 /* Search for all users and deepen their dos info by one level */
 void CPUParallel::searchAll() {
     int user_count = all_user_list.size();
@@ -156,7 +162,7 @@ void CPUParallel::searchAll() {
         user_id_to_vector_idx_map[user_id] = i;
     }
 
-    /* Search one by one for each user. Should go parallel here */
+    /* Search one by one for each user */
     int current_group_idx = 0;
     vector<int>::iterator it;
     for (it = all_user_list.begin(); it < all_user_list.end(); it++) {

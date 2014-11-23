@@ -28,6 +28,7 @@ public:
 	CPUParallel(const char* filename);
 	vector<int> getDOS(int user_id1, int user_id2);
 	vector<int> constructPath(int root_user_id, int child_user_id);
+	bool hasUser(int user_id);
 	void searchAll();
 };
 
