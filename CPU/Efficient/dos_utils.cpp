@@ -105,7 +105,7 @@ void ResultsPerUser::addOneLevel(OneLevelInfo one_level_info) {
 }
 
 /* Search for current user and deepen his/her dos info by one level */
-void ResultsPerUser::searchAll(int group_idx, unordered_map<int, int>* user_to_group_map) {
+void ResultsPerUser::searchAll(int group_idx, unordered_map<int, int>* user_to_group_map, omp_lock_t* writelock) {
     bool should_continue = true;
 
     while (should_continue) {
@@ -116,7 +116,7 @@ void ResultsPerUser::searchAll(int group_idx, unordered_map<int, int>* user_to_g
         OneLevelInfo new_level(current_level);
 
         /* Search through new users found in previous deepest level to deepen path by one */
-        #pragma parallel for
+        #pragma omp parallel for
         for (int i = 0; i < previous_level_user_count; i++) {
             int user_id = (*previous_level_users)[i].user_id;
             vector<int> friend_list_of_user = raw_data_map.find(user_id)->second;
@@ -127,7 +127,9 @@ void ResultsPerUser::searchAll(int group_idx, unordered_map<int, int>* user_to_g
                 if (it != user_to_group_map->end() && it->second == -1) {
                     // Find a path to a new user who has not been reached by this user before.
                     // Record it using UserTrace object and result vector
+                    omp_set_lock(writelock);
                     new_level.addUser(UserTrace(friend_list_of_user[j], user_id));
+                    omp_unset_lock(writelock);
                     it->second = group_idx;
                 }
             } 
@@ -148,7 +150,9 @@ void ResultsPerUser::searchAll(int group_idx, unordered_map<int, int>* user_to_g
 /*
  * Class ResultsAllUsers
  */
- ResultsAllUsers::ResultsAllUsers() {}
+ ResultsAllUsers::ResultsAllUsers() {
+    omp_init_lock(&writelock);
+}
 
  ResultsAllUsers* ResultsAllUsers::getInstance() {
     if (!instance) {
@@ -163,6 +167,11 @@ void ResultsAllUsers::initUserToGroupMap(vector<int> all_user_list) {
     for (it = all_user_list.begin(); it != all_user_list.end(); it++) {
         user_to_group_map.insert(pair<int, int>(*it, -1));
     }
+}
+
+/* Return the pointer to the write lock */
+omp_lock_t* ResultsAllUsers::getWriteLock() {
+    return &writelock;
 }
 
 /* Get the ResultsPerUser objects for all users in a vector */

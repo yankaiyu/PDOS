@@ -13,6 +13,7 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
+#include <omp.h>
 using namespace std;
 
 /*
@@ -54,7 +55,7 @@ public:
 	vector<OneLevelInfo>* getAllLevelInfoList();
 	void addUserAtLevel(int user_id, int level);
 	void addOneLevel(OneLevelInfo one_level_info);
-	void searchAll(int group_idx, unordered_map<int, int>* user_to_group_map);
+	void searchAll(int group_idx, unordered_map<int, int>* user_to_group_map, omp_lock_t* writelock);
 };
 
 /*
@@ -62,6 +63,8 @@ public:
  */
 class ResultsAllUsers {
 private:
+	omp_lock_t writelock;
+
     ResultsAllUsers();
     static ResultsAllUsers* instance;
 	vector<ResultsPerUser> user_result_list;
@@ -71,6 +74,7 @@ public:
 	static ResultsAllUsers* getInstance();
 	void initFriendList(unordered_map<int, vector<int> > raw_data_map);
 	void initUserToGroupMap(vector<int> all_user_list);
+	omp_lock_t* getWriteLock();
 	vector<ResultsPerUser>* getAllResults();
 	ResultsPerUser* getResultsByUser(int user_id);
 	unordered_map<int, int>* getUserToGroupMap();

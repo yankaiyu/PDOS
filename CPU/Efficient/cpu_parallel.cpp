@@ -174,7 +174,7 @@ void CPUParallel::searchAll() {
             all_result_ptr->getGroupToRootUserMap()->insert(pair<int, int>(current_group_idx, *it));
             int vector_idx = user_id_to_vector_idx_map[*it];
             (*all_results)[vector_idx].initFriendList(this->raw_data_ptr->getRawDataMap());
-            all_result_ptr->getResultsByUser(*it)->searchAll(current_group_idx, all_result_ptr->getUserToGroupMap());
+            all_result_ptr->getResultsByUser(*it)->searchAll(current_group_idx, all_result_ptr->getUserToGroupMap(), all_result_ptr->getWriteLock());
         }
     }
 
