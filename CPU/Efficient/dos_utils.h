@@ -24,7 +24,6 @@ public:
 	int user_id;
 	int previous_id;
 	UserTrace(int user_id, int previous_id = -1);
-	//bool operator<(UserTrace) const;
 };
 
 /*
@@ -50,7 +49,6 @@ class ResultsPerUser {
 	unordered_map<int, vector<int> > raw_data_map;
 public:
 	ResultsPerUser(int user_id);
-	//void initAllUserSet(set<int> all_user_set);
 	void initFriendList(unordered_map<int, vector<int> > raw_data_map);
 	int getUserId();
 	vector<OneLevelInfo>* getAllLevelInfoList();

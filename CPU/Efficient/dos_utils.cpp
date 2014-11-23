@@ -20,12 +20,6 @@ UserTrace::UserTrace(int user_id, int previous_id) {
 }
 
 /*
-bool UserTrace::operator<(UserTrace other) const {
-    return (this->user_id < other.user_id);
-}
-*/
-
-/*
  * Class OneLevelInfo
  */
 OneLevelInfo::OneLevelInfo(int current_level) {
@@ -57,13 +51,6 @@ ResultsPerUser::ResultsPerUser(int user_id) {
     this->user_id = user_id;
     addUserAtLevel(user_id, 0);
 }
-
-/* Init the set containing all users' ids for this user */
-/*
-void ResultsPerUser::initAllUserSet(set<int> all_user_set) {
-    this->remained_user_set = all_user_set;
-}
-*/
 
 /* Init the friend lists for this user */
 void ResultsPerUser::initFriendList(unordered_map<int, vector<int> > raw_data_map) {
@@ -129,7 +116,7 @@ void ResultsPerUser::searchAll(int group_idx, unordered_map<int, int>* user_to_g
         OneLevelInfo new_level(current_level);
 
         /* Search through new users found in previous deepest level to deepen path by one */
-        #pragma omp for
+        #pragma parallel for
         for (int i = 0; i < previous_level_user_count; i++) {
             int user_id = (*previous_level_users)[i].user_id;
             vector<int> friend_list_of_user = raw_data_map.find(user_id)->second;
@@ -169,26 +156,6 @@ void ResultsPerUser::searchAll(int group_idx, unordered_map<int, int>* user_to_g
     }
     return instance;
 }
-
-/* Init the set containing all users' ids for each users stored in the ResultsAllUser object */
-/*
-void ResultsAllUsers::initAllUserSet(set<int> all_user_set) {
-    #pragma omp parallel for
-    for (int i = 0; i < user_result_list.size(); i++) {
-        user_result_list[i].initAllUserSet(all_user_set);
-    }
-}
-*/
-
-/* Init the friend lists for all users stored in the ResultsAllUser object */
-/*
-void ResultsAllUsers::initFriendList(unordered_map<int, vector<int> > raw_data_map) {
-    #pragma omp parallel for
-    for (int i = 0; i < user_result_list.size(); i++) {
-        user_result_list[i].initFriendList(raw_data_map);
-    }
-}
-*/
 
 /* Init the group each user belongs to */
 void ResultsAllUsers::initUserToGroupMap(vector<int> all_user_list) {
