@@ -1,0 +1,111 @@
+//
+//  main.cpp
+//  Parallel Degree of Separation
+//
+//  Created by Cary on 11/16/14.
+//  Copyright (c) 2014 Cary. All rights reserved.
+//
+
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <set>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <sys/time.h>
+#include <time.h>
+#include <math.h>
+#include <cuda_runtime.h>
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+
+using namespace std;
+
+int main(int argc, const char * argv[]) {
+    if (argc < 1) {
+        cout<<"Please enter the path of input data file"<<endl;
+        return 0;
+    }
+
+    struct timeval starttime,endtime;
+
+    thrust::host_vector<int> user1;
+    thrust::host_vector<int> user2;
+    set<int> unique_user;
+
+    gettimeofday(&starttime,NULL);
+    
+    //reading file
+    ifstream data_file;
+    data_file.open(filename);
+    if (data_file.is_open()) {
+        //cout<<"File opened"<<endl;
+        int id1, id2;
+        while (data_file.eof() == false) {
+            data_file>>id1>>id2;
+	    user1.push_back(id1);
+            user2.push_back(id2);
+            unique_user.insert(id1);
+            unique_user.insert(id2);
+        }
+    } else {
+        cout<<"File did not open"<<endl;
+        exit(0);
+    }
+    data_file.close();
+    
+    cout<<"#Node := "<<unique_user.size()<<endl;
+    cout<<"#Edge := "<<user1.size()<<endl;
+
+    gettimeofday(&endtime,NULL);
+    long long time = ((endtime_serial.tv_sec * 1000000 + endtime_serial.tv_usec) - (starttime_serial.tv_sec * 1000000 + starttime_serial.tv_usec));
+    printf(">>>Initializaton takes := %ld microseconds \n\n", time);
+
+/*    int search_depth;
+    cout<<"#Level you want to search: ";
+    cin>>search_depth;
+
+
+    t_begin = omp_get_wtime();
+
+    for (int i = 1; i <= search_depth; i++) {
+        cout<<">>>Current level := "<<i<<endl;
+        pdos_cpu.deepenOneLevel();
+    }
+
+    cout<<endl<<">>>Search finished!\n";
+
+    t_end = omp_get_wtime();
+    printf(">>>Time used := %fs with #Core := %d\n\n", t_end - t_begin, num_of_threads);
+
+    bool should_continue = true;
+    while (should_continue) {
+        int user_id1, user_id2;
+        cout<<endl;
+        cout<<"Enter first user's ID: ";
+        cin >> user_id1;
+        cout<<"Enter second user's ID: ";
+        cin >> user_id2;
+
+        vector<int> dos = pdos_cpu.getDOS(user_id1, user_id2);
+
+        if (dos.size() == 0) {
+            cout<<"\nUser "<<user_id1<<" and User "<<user_id2<<" are not connected within search level := "<<search_depth<<endl<<endl;
+        } else {
+            cout<<"\nDegree of Separation between User "<<user_id1<<" and User "<<user_id2<<" is "<<dos.size() - 1<<endl;
+            for (int i = 0; i < dos.size() - 1; i++) {
+                cout<<dos[i]<<"<-";
+            }
+            cout<<dos[dos.size() - 1]<<endl;
+        }
+        
+        cout<<"\nDo you want to continue? 1 for yes and 0 for no: ";
+        cin>>should_continue;
+    }
+
+    cout<<endl;*/
+    
+    return 0;
+}

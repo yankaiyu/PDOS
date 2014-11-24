@@ -1,0 +1,3 @@
+Compile Command:
+
+nvcc -arch=sm_20 main.cu -o test
