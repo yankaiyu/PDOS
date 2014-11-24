@@ -203,18 +203,7 @@ ResultsPerUser* ResultsAllUsers::getResultsByUser(int user_id) {
 }
 
 void ResultsAllUsers::addUserById(int user_id) {
-    int user_list_size = user_result_list.size();
-
-    for (int i = 0; i < user_list_size; i++) {
-        if (user_result_list[i].getUserId() == user_id) {
-            // User Id already stored in the list, return without inserting
-            return;
-        }
-    }
-
-    // User Id doesn't exist, add new entry
     user_result_list.push_back(ResultsPerUser(user_id));
-
     return;
 }
 
