@@ -1,8 +1,6 @@
 all:
-	g++ *.cpp *.h -o pdos.bin -fopenmp
-opt:
-	g++ *.cpp *.h -fopenmp -O3 -o pdos.bin
+	nvcc -arch=sm_20 main.cu -o test
 run:
-	./pdos.bin data.txt
+	./test data.txt
 clean:
-	rm -rf pdos.bin
+	rm -rf test

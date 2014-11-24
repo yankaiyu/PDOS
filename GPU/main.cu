@@ -115,7 +115,7 @@ __global__ void find(int *user1, int *user2, int *friend_list, int *level_conten
 }
 
 int main(int argc, const char * argv[]) {
-    if (argc < 1) {
+    if (argc < 2) {
         std::cout<<"Please enter the path of input data file\n";
         return 0;
     }
@@ -154,7 +154,7 @@ int main(int argc, const char * argv[]) {
  
     gettimeofday(&endtime,NULL);
     long long time = ((endtime.tv_sec * 1000000 + endtime.tv_usec) - (starttime.tv_sec * 1000000 + starttime.tv_usec));
-    printf(">>>Initializaton takes := %ld microseconds \n\n", time);
+    printf(">>>Initializaton takes := %lld microseconds \n\n", time);
 
     int search_depth;
     std::cout<<"#Level you want to search: ";
