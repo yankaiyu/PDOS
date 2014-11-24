@@ -12,7 +12,8 @@
 #include <stdio.h>
 #include <vector>
 #include <set>
-#include <map>
+#include <unordered_map>
+#include <omp.h>
 using namespace std;
 
 /*
@@ -24,7 +25,6 @@ public:
 	int user_id;
 	int previous_id;
 	UserTrace(int user_id, int previous_id = -1);
-	//bool operator<(UserTrace) const;
 };
 
 /*
@@ -47,17 +47,15 @@ public:
 class ResultsPerUser {
 	int user_id;
 	vector<OneLevelInfo> all_level_info_list;
-	set<int> remained_user_set;
-	map<int, vector<int> > raw_data_map;
+	unordered_map<int, vector<int> > raw_data_map;
 public:
 	ResultsPerUser(int user_id);
-	void initAllUserSet(set<int> all_user_set);
-	void initFriendList(map<int, vector<int> > raw_data_map);
+	void initFriendList(unordered_map<int, vector<int> > raw_data_map);
 	int getUserId();
 	vector<OneLevelInfo>* getAllLevelInfoList();
 	void addUserAtLevel(int user_id, int level);
 	void addOneLevel(OneLevelInfo one_level_info);
-	void deepenOneLevel();
+	void searchAll(int group_idx, unordered_map<int, int>* user_to_group_map, omp_lock_t* writelock);
 };
 
 /*
@@ -65,17 +63,25 @@ public:
  */
 class ResultsAllUsers {
 private:
+	omp_lock_t writelock;
+
     ResultsAllUsers();
     static ResultsAllUsers* instance;
-
 	vector<ResultsPerUser> user_result_list;
+	unordered_map<int, int> user_to_group_map;
+	unordered_map<int, int> group_to_root_user_map;
 public:
 	static ResultsAllUsers* getInstance();
-	void initiAllUserSet(set<int> remained_user_set);
-	void initFriendList(map<int, vector<int> > raw_data_map);
+	void initFriendList(unordered_map<int, vector<int> > raw_data_map);
+	void initUserToGroupMap(vector<int> all_user_list);
+	omp_lock_t* getWriteLock();
 	vector<ResultsPerUser>* getAllResults();
 	ResultsPerUser* getResultsByUser(int user_id);
+	unordered_map<int, int>* getUserToGroupMap();
+	unordered_map<int, int>* getGroupToRootUserMap();
+	void resizeUserVector(int user_count);
 	void addUserById(int user_id);
+	void addUserByIdAt(int user_id, int idx);
 	void addUserByResults(ResultsPerUser results_per_user);
 };
 

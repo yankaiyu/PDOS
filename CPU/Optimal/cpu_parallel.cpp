@@ -63,7 +63,7 @@ CPUParallel::CPUParallel(const char* filename) {
     cout<<">>>Initialization finished!"<<endl;
 }
 
-/* Return the degree of separation betwen user 1 and user 2. Return -1 if not connected */
+/* Return the degree of separation betwen user 1 and user 2. */
 vector<int> CPUParallel::getDOS(int user_id1, int user_id2) {
     ResultsPerUser* user_results_ptr = this->all_result_ptr->getResultsByUser(user_id1);
     vector<int> result_path;

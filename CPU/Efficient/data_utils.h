@@ -10,7 +10,7 @@
 #define __Parallel_Degree_of_Separation__data_utils__
 
 #include <stdio.h>
-#include <map>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
@@ -20,15 +20,15 @@ private:
     static DataUtils* instance;
     
     int num_of_edges;
-    map<int, vector<int> > raw_data_map;
-    
+    unordered_map<int, vector<int> > raw_data_map;
+
 public:
     static DataUtils* getInstance();
     void addEdge(int user_id1, int user_id2);
     int getNumOfNodes();
     int getNumOfEdges();
     vector<int> getAllNodes();
-    map<int, vector<int> > getRawDataMap();
+    unordered_map<int, vector<int> > getRawDataMap();
 };
 
 #endif /* defined(__Parallel_Degree_of_Separation__data_utils__) */

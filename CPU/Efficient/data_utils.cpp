@@ -21,7 +21,7 @@ DataUtils* DataUtils::getInstance() {
 }
 
 void DataUtils::addEdge(int user_id1, int user_id2) {
-    map<int, vector<int> >::iterator it;
+    unordered_map<int, vector<int> >::iterator it;
     
     // Insert edge into user_id1's firend list
     it = raw_data_map.find(user_id1);
@@ -58,7 +58,7 @@ int DataUtils::getNumOfEdges() {
 vector<int> DataUtils::getAllNodes() {
     vector<int> result;
 
-    map<int, vector<int> >::iterator it;
+    unordered_map<int, vector<int> >::iterator it;
     for (it = raw_data_map.begin(); it != raw_data_map.end(); it++) {
         result.push_back(it->first);
     }
@@ -67,7 +67,7 @@ vector<int> DataUtils::getAllNodes() {
 }
 
 /* Get the raw data map containing users and their own friend lists */
-map<int, vector<int> > DataUtils::getRawDataMap() {
+unordered_map<int, vector<int> > DataUtils::getRawDataMap() {
     return raw_data_map;
 }
 
