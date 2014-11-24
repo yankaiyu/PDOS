@@ -12,5 +12,7 @@ The default data is stored in data.txt. To run using this data, just use command
 
 GPU Version:
 
-There are only one GPU version of finding the optimal solution, which is develoepd on the basis of CUDA. Enter "GPU" folder and use "make" in command line to complie with NVCC. The default data is stored in data.txt. To run using this data, just use command "make run". To use your own data, either replace the content of data.txt or use "./test $DATA_FILE_PATH".
+There are only one GPU version of finding the optimal solution, which is develoepd on the basis of CUDA. Enter "GPU" folder and use "make" in command line to complie with NVCC. You can also use "make clean" to delete the executable file.
+
+The default data is stored in data.txt. To run using this data, just use command "make run". To use your own data, either replace the content of data.txt or use "./test $DATA_FILE_PATH".
 
