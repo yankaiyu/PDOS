@@ -48,6 +48,7 @@ __global__ void search_first_level(int *input_user1, int *input_user2, int *leve
     bound[(thid+start_pos)] = j;
   }
 }
+
 __global__ void search_other_level(int *input_user1, int *input_user2, int *level_content, int *parent_content, int *friend_list, int *num_node, int *num_friend, int *in_bound_1, int *in_bound_2)
 {
   int thid = threadIdx.x;
