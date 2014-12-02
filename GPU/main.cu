@@ -31,6 +31,7 @@ __global__ void search_first_level(int *input_user1, int *input_user2, int *leve
     
     for(int i = 0; i < *num_edge; i++)
     {
+
       if(input_user1[i] == (thid+start_pos))
       {
         friend_list[(thid+start_pos)*(*num_node)+input_user2[i]] = input_user2[i];
@@ -58,6 +59,7 @@ __global__ void search_other_level(int *input_user1, int *input_user2, int *leve
     int l_bound = in_bound_1[thid+start_pos];
     int u_bound = in_bound_2[thid+start_pos];
     in_bound_1[thid+start_pos] = u_bound;
+
     for(int k = l_bound; k < u_bound; k++)
     {
       int friend_t = level_content[(thid+start_pos)*(*num_node)+k];  
@@ -70,9 +72,7 @@ __global__ void search_other_level(int *input_user1, int *input_user2, int *leve
         for(int n = 0; n < num_friend[friend_t]; n++)
         {
           int temp = level_content[friend_t*(*num_node)+n];
-          if((thid+start_pos)*(*num_node)+temp > (*num_node)*(*num_node))
-            printf("friend_t: %d num_friend: %d\n", friend_t,num_friend[friend_t]);
-          if(friend_list[(thid+start_pos)*(*num_node)+temp] == -1)
+          if(friend_list[(thid+start_pos)*(*num_node)+temp] == -1 && temp != thid+start_pos)
           {
             friend_list[(thid+start_pos)*(*num_node)+temp] = temp;
             level_content[(thid+start_pos)*(*num_node)+in_bound_2[thid+start_pos]] = temp;
@@ -92,15 +92,13 @@ __global__ void find(int *user1, int *user2, int *friend_list, int *level_conten
   int start_pos = blockIdx.x*blockDim.x;
   int parent_index = 0;
   *outsize = 0;
-  if(thid == 0 && start_pos == 0)
-  {
-    *found = 0;
-  }
   if(thid+start_pos < *num_node)
   {
-    if(level_content[(*user1)*(*num_node)+(thid+start_pos)] == *user2)
+    if(level_content[(*user1)*(*num_node)+(thid+start_pos)] == *user2 && friend_list[(*user1)*(*num_node)+*user2] != -1)
     {
       *found = 1;
+      printf("FOUND User %d !!!!!! At %d\n",level_content[(*user1)*(*num_node)+(thid+start_pos)], thid+start_pos);
+
       parent_index = parent_content[(*user1)*(*num_node)+(thid+start_pos)];
       output[*outsize] = level_content[(*user1)*(*num_node)+(thid+start_pos)];
       (*outsize)++;
@@ -204,10 +202,10 @@ int main(int argc, const char * argv[]) {
       exit(-1);
     }
 
-    cudaMemset((int**)device_level_content,-1,num_node*num_node);
-    cudaMemset((int**)device_parent_content,-1,num_node*num_node);
-    cudaMemset((int**)friend_list,-1,num_node*num_node);
-    cudaMemset((int**)inbound_1,0,num_node);
+    cudaMemset((int**)device_level_content,-1,num_node*num_node*4);
+    cudaMemset((int**)device_parent_content,-1,num_node*num_node*4);
+    cudaMemset((int**)friend_list,-1,num_node*num_node*4);
+    cudaMemset((int**)inbound_1,0,num_node*4);
     cudaMemcpy(device_num_node, &num_node, sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(device_num_edge, &num_edge, sizeof(int), cudaMemcpyHostToDevice);
 
@@ -296,9 +294,12 @@ int main(int argc, const char * argv[]) {
         exit(-1);
       }
 
-      cudaMemset((int**)device_output,0,search_depth);
-      cudaMemset((int**)device_size,0,1);
+      cudaMemset((int**)device_output,0,search_depth*4);
+      cudaMemset((int**)device_size,0,4);
+      cudaMemset((int**)found,0,4);
       cudaMemcpy(device_input1, &user_id1, sizeof(int), cudaMemcpyHostToDevice);
+      cudaMemcpy(device_input2, &user_id2, sizeof(int), cudaMemcpyHostToDevice);
+
       error = cudaGetLastError();
       if(error != cudaSuccess)
       {
@@ -306,7 +307,6 @@ int main(int argc, const char * argv[]) {
         exit(-1);
       }
 
-      cudaMemcpy(device_input2, &user_id2, sizeof(int), cudaMemcpyHostToDevice);
 
 
 
