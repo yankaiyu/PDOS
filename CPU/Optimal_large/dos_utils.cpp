@@ -6,9 +6,10 @@
 //  Copyright (c) 2014 Cary. All rights reserved.
 //
 
+#include "data_utils.h"
 #include "dos_utils.h"
+#include "dos_lock.h"
 #include <omp.h>
-//#include <iostream>
 using namespace std;
 
 /*
@@ -53,19 +54,10 @@ int OneLevelInfo::getCurrentLevelUserNum() {
 /*
  * Class ResultsPerUser
  */
-ResultsPerUser::ResultsPerUser(int user_id) {
+ResultsPerUser::ResultsPerUser(int user_id, int total_user_count) {
     this->user_id = user_id;
     addUserAtLevel(user_id, 0);
-}
-
-/* Init the set containing all users' ids for this user */
-void ResultsPerUser::initAllUserSet(set<int> all_user_set) {
-    this->remained_user_set = all_user_set;
-}
-
-/* Init the friend lists for this user */
-void ResultsPerUser::initFriendList(unordered_map<int, vector<int> > raw_data_map) {
-    this->raw_data_map = raw_data_map;
+    this->total_user_count = total_user_count;
 }
 
 /* Get this user's id */
@@ -119,7 +111,7 @@ void ResultsPerUser::addOneLevel(OneLevelInfo one_level_info) {
 void ResultsPerUser::deepenOneLevel() {
     int current_level = all_level_info_list.size();
 
-    if (remained_user_set.size() == 0) {
+    if (reached_user_set.size() == total_user_count) {
         // This user already has connection to all users. No need to continue
         return;
     }
@@ -133,17 +125,20 @@ void ResultsPerUser::deepenOneLevel() {
     /* Search through new users found in previous deepest level to deepen path by one */
     for (int i = 0; i < previous_level_user_count; i++) {
         int user_id = (*previous_level_users)[i].user_id;
-        vector<int> friend_list_of_user = raw_data_map.find(user_id)->second;
+        omp_set_lock(&data_lock);
+        unordered_map<int, vector<int> > *raw_data_map = DataUtils::getInstance()->getRawDataMap();
+        vector<int> friend_list_of_user = raw_data_map->find(user_id)->second;
         int friends_count = friend_list_of_user.size();
 
         for (int j = 0; j < friends_count; j++) {
-            if (remained_user_set.find(friend_list_of_user[j]) != remained_user_set.end()) {
+            if (reached_user_set.find(friend_list_of_user[j]) == reached_user_set.end()) {
                 // Find a path to a new user who has not been reached by this user before.
                 // Record it using UserTrace object and remove new user's id from remained unvisited users' set
                 new_level.addUser(UserTrace(friend_list_of_user[j], user_id));
-                remained_user_set.erase(friend_list_of_user[j]);
+                reached_user_set.insert(friend_list_of_user[j]);
             }
         } 
+        omp_unset_lock(&data_lock);
     }
 
     if (new_level.getCurrentLevelUserNum() == 0) {
@@ -164,24 +159,9 @@ void ResultsPerUser::deepenOneLevel() {
  ResultsAllUsers* ResultsAllUsers::getInstance() {
     if (!instance) {
         instance = new ResultsAllUsers();
+        omp_init_lock(&data_lock);
     }
     return instance;
-}
-
-/* Init the set containing all users' ids for each users stored in the ResultsAllUser object */
-void ResultsAllUsers::initiAllUserSet(set<int> all_user_set) {
-    #pragma omp parallel for
-    for (int i = 0; i < user_result_list.size(); i++) {
-        user_result_list[i].initAllUserSet(all_user_set);
-    }
-}
-
-/* Init the friend lists for all users stored in the ResultsAllUser object */
-void ResultsAllUsers::initFriendList(unordered_map<int, vector<int> > raw_data_map) {
-    #pragma omp parallel for
-    for (int i = 0; i < user_result_list.size(); i++) {
-        user_result_list[i].initFriendList(raw_data_map);
-    }
 }
 
 /* Get the ResultsPerUser objects for all users in a vector */
@@ -202,8 +182,8 @@ ResultsPerUser* ResultsAllUsers::getResultsByUser(int user_id) {
     return NULL;
 }
 
-void ResultsAllUsers::addUserById(int user_id) {
-    user_result_list.push_back(ResultsPerUser(user_id));
+void ResultsAllUsers::addUserById(int user_id, int total_user_count) {
+    user_result_list.push_back(ResultsPerUser(user_id, total_user_count));
     return;
 }
 

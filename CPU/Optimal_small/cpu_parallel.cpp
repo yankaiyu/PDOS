@@ -46,7 +46,7 @@ CPUParallel::CPUParallel(const char* filename) {
     this->all_result_ptr = ResultsAllUsers::getInstance();
     this->all_user_list = data_utils_ptr->getAllNodes();
 
-    set<int> all_user_set;
+    unordered_set<int> all_user_set;
     int user_count = all_user_list.size();
     
     for (int i = 0; i < user_count; i++) {
