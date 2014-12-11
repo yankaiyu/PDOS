@@ -1,6 +1,6 @@
 all:
-	nvcc -arch=sm_20 main.cu -o test
+	nvcc -arch=sm_20 PDOS.cu -o pdos.bin
 run:
-	./test data.txt
+	./pdos.bin data.txt
 clean:
-	rm -rf test
+	rm -rf pdos.bin
