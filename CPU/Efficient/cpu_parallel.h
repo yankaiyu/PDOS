@@ -23,7 +23,7 @@ private:
 	DataUtils* raw_data_ptr;
 	ResultsAllUsers* all_result_ptr;
 	vector<int> all_user_list;
-	set<int> all_user_set;
+	unordered_set<int> all_user_set;
 public:
 	CPUParallel(const char* filename);
 	vector<int> getDOS(int user_id1, int user_id2);
