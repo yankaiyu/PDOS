@@ -40,7 +40,10 @@ int main(int argc, const char * argv[]) {
 
     for (int i = 1; i <= search_depth; i++) {
         cout<<">>>Current level := "<<i<<endl;
+        double t_one_loop_begin = omp_get_wtime();
         pdos_cpu.deepenOneLevel();
+        double t_one_loop_end = omp_get_wtime();
+        printf(">>>Time used := %fs at this level\n", t_one_loop_end - t_one_loop_begin);
     }
 
     cout<<endl<<">>>Search finished!\n";
