@@ -8,7 +8,6 @@
 
 #include "data_utils.h"
 #include "dos_utils.h"
-#include "dos_lock.h"
 #include <omp.h>
 using namespace std;
 
@@ -125,7 +124,6 @@ void ResultsPerUser::deepenOneLevel() {
     /* Search through new users found in previous deepest level to deepen path by one */
     for (int i = 0; i < previous_level_user_count; i++) {
         int user_id = (*previous_level_users)[i].user_id;
-        omp_set_lock(&data_lock);
         unordered_map<int, vector<int> > *raw_data_map = DataUtils::getInstance()->getRawDataMap();
         vector<int> friend_list_of_user = raw_data_map->find(user_id)->second;
         int friends_count = friend_list_of_user.size();
@@ -138,7 +136,6 @@ void ResultsPerUser::deepenOneLevel() {
                 reached_user_set.insert(friend_list_of_user[j]);
             }
         } 
-        omp_unset_lock(&data_lock);
     }
 
     if (new_level.getCurrentLevelUserNum() == 0) {
@@ -159,7 +156,6 @@ void ResultsPerUser::deepenOneLevel() {
  ResultsAllUsers* ResultsAllUsers::getInstance() {
     if (!instance) {
         instance = new ResultsAllUsers();
-        omp_init_lock(&data_lock);
     }
     return instance;
 }
