@@ -24,3 +24,6 @@ There are only one GPU version of finding the optimal solution, which is develoe
 
 The default data is stored in data.txt. To run using this data, just use command "make run". To use your own data, either replace the content of data.txt or use "./test $DATA_FILE_PATH".
 
+Sample Dataset
+=============================
+We have four sampel data under /Sample_Dataset/, namely ego-facebook.txt, wiki-Vote.txt, ca-HepTh.txt, ca-GrQc.txt
